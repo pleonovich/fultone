@@ -1,5 +1,5 @@
 # simDB
-simDB is simple object-relational update queries helper for SafeMySQL
+simDB is simple object-relational queries helper for SafeMySQL
 
 ### Requirements:
 <https://github.com/colshrapnel/safemysql>
