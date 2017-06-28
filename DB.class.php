@@ -1,9 +1,9 @@
 <?php
 /**
- * DB CLASS 1.0.0
+ * simDB CLASS 1.0.0
  *
  * @author leonovich.pavel@gmail.com
- * DB is simple object-relational update queries helper for SafeMySQL.
+ * simDB is simple object-relational update queries helper for SafeMySQL.
  *
  * Requirements:
  * https://github.com/colshrapnel/safemysql

@@ -72,13 +72,9 @@ class DBcreate extends DBquery
     }
 
     /**
-     * Set int field
+     * Set id field
      *
      * @param string $name - column name
-     * @param string $length - length
-     * @param string $Null - Null
-     * @param string $key - key
-     * @param string $default - default
      * @return this object
      */
     public function id($name='id')
