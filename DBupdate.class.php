@@ -10,23 +10,23 @@
  *
  * Some examples:
  *
- * $result = DBupdate::factory($db)
+ * $result = DBupdate::factory()
  * ->table("dbtable")
  * ->set(array("name"=>"value"))
  * ->execute();
  *
- * $result = DBupdate::factory($db)
+ * $result = DBupdate::factory()
  * ->table("dbtable")
  * ->setAll(array("name"=>"value","text"=>"Hello world!"))
  * ->executeODKU();
  *
- * $result = DBupdate::factory($db)
+ * $result = DBupdate::factory()
  * ->table("dbtable")
  * ->set("id","1")
  * ->set("text","Hello world!")
  * ->executeODKU();
  *
- * $result = DBupdate::factory($db)
+ * $result = DBupdate::factory()
  * ->table("dbtable")
  * ->setPOST()
  * ->executeODKU();
@@ -38,9 +38,9 @@ require_once('DBquery.class.php');
 class DBupdate extends DBquery
 {
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        parent::__construct($db);
+        parent::__construct();
     }
 
 	/**
@@ -154,9 +154,9 @@ class DBupdate extends DBquery
         return $this->db->query($query);
     }
 
-    public static function factory(SafeMySQL $db)
+    public static function factory()
     {
-        return new DBupdate($db);
+        return new DBupdate();
     }
 
 }

@@ -4,20 +4,24 @@ simDB is simple object-relational queries helper for SafeMySQL
 ### Requirements:
 <https://github.com/colshrapnel/safemysql>
 
-### DB connection
+### DB connection configuration
+Connection configuration in Config.class.php
 ```php
-$opts = array(
-	'user'    => Config::DB_USER,
-	'pass'    => Config::DB_PASS,
-	'db'      => Config::DB_NAME,
-	'charset' => Config::DB_CHARSET
-);
-$conn = new SafeMySQL($opts);
+class Config
+{
+    
+    // DB CONNECTION
+    const DB_USER = 'root';
+    const DB_PASS = '';
+    const DB_NAME = 'simdb';
+    const DB_CHARSET = 'utf8';
+
+}
 ```
 
 ### Create new table
 ```php
-$result = DB::create($conn)
+$result = DB::create()
 ->table("table_name")
 ->id('id')
 ->varchar('title', '255')
@@ -26,7 +30,7 @@ $result = DB::create($conn)
 
 ### Insert into table
 ```php
-$result = DB::insert($conn)
+$result = DB::insert()
 ->into("data_table")
 ->set('title','data1')
 ->execute();
@@ -34,7 +38,7 @@ $result = DB::insert($conn)
 
 ### Select from table
 ```php
-$result = DB::select($conn)
+$result = DB::select()
 ->names('id','title')
 ->from("data_table")
 ->where('id','1')
@@ -43,7 +47,7 @@ $result = DB::select($conn)
 
 ### Update table
 ```php
-$result = DB::update($conn)
+$result = DB::update()
 ->table("data_table")
 ->set('id','1')
 ->set('title','data2')
@@ -52,7 +56,7 @@ $result = DB::update($conn)
 
 ### Delete from table
 ```php
-$result = DB::delete($conn)
+$result = DB::delete()
 ->from("data_table")
 ->where('id','1')
 ->execute();

@@ -10,12 +10,12 @@
  *
  * Some examples:
  *
- * $result = DBselect::factory($db)
+ * $result = DBselect::factory()
  * ->names("id","name","phone","age")
  * ->from("dbtable")
  * ->executeAll();
  *
- * $result = DBselect::factory($db)
+ * $result = DBselect::factory()
  * ->names("id","name","phone","age")
  * ->from("dbtable")
  * ->where("id","=",1)
@@ -30,9 +30,9 @@ class DBselect extends DBquery
     
     protected $distinct = false;
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        parent::__construct($db);
+        parent::__construct();
     }
     
 	/**
@@ -128,8 +128,8 @@ class DBselect extends DBquery
         return $this->db->getCol($query);
     }
     	
-    public static function factory(SafeMySQL $db)
+    public static function factory()
     {
-        return new DBSelect($db);
+        return new DBSelect();
     }
 }

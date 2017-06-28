@@ -7,31 +7,31 @@
  *
  * Requirements:
  * https://github.com/colshrapnel/safemysql
- * 
+ *
  * Some examples:
  *
  * CREATE TABLE
- * $result = DB::create($conn)
+ * $result = DB::create()
  * ->table("data_table")
  * ->id('id')
  * ->varchar('title', '255')
  * ->execute();
- * 
+ *
  * INSERT INTO TABLE
- * $result = DB::insert($conn)
+ * $result = DB::insert()
  * ->into("data_table")
  * ->set('title','data1')
  * ->execute();
- * 
+ *
  * UPDATE TABLE
- * $result = DB::update($conn)
+ * $result = DB::update()
  * ->table("data_table")
  * ->set('id','1')
  * ->set('title','data2')
  * ->executeODKU();
- * 
+ *
  * SELECT FROM TABLE
- * $result = DB::select($conn)
+ * $result = DB::select()
  * ->names('id','title')
  * ->from("data_table")
  * ->where('id','1')
@@ -51,8 +51,6 @@ class DB
     /**
      * Select, insert , update or create
      *
-     * @param string $name - function name
-     * @param array $params - params
      * @return this object
      */
     public static function __callStatic($name, array $params)
@@ -62,7 +60,7 @@ class DB
             if ($name===$f) {
                 $classname = 'DB'.$f;
                 if (class_exists($classname)) {
-                    return new $classname($params[0]);
+                    return new $classname();
                 } else {
                     die("Error! $classname class doesn`t found");
                 }

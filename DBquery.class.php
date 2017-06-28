@@ -27,9 +27,22 @@ abstract class DBquery
     protected $orderByDesc = false;
     protected $limit = array();
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        $this->db = $db;
+        if($this->db===null) $this->connect();
+    }
+
+    /**
+     * DB connection
+     */
+    private function connect()
+    {
+        $this->db = new SafeMySQL(array(
+            'user'    => Config::DB_USER,
+            'pass'    => Config::DB_PASS,
+            'db'      => Config::DB_NAME,
+            'charset' => Config::DB_CHARSET
+        ));
     }
 
     protected function describe()

@@ -11,7 +11,7 @@
  * 
  * Example:
  *
- * $result = DBdelete::factory($conn)
+ * $result = DBdelete::factory()
  * ->from("test_delete")
  * ->id('id')
  * ->varchar('name', '50')
@@ -26,9 +26,9 @@ require_once('DBquery.class.php');
 class DBdelete extends DBquery
 {
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        parent::__construct($db);
+        parent::__construct();
     }
 
     /**
@@ -54,9 +54,9 @@ class DBdelete extends DBquery
         return $query;
     }
 
-    public static function factory(SafeMySQL $db)
+    public static function factory()
     {
-        return new DBcreate($db);
+        return new DBcreate();
     }
 
 }

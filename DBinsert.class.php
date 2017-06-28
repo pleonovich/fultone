@@ -10,23 +10,23 @@
  *
  * Some examples:
  *
- * $result = DBinsert::factory(SafeMySQL $db)
+ * $result = DBinsert::factory()
  * ->into("dbtable")
  * ->set(array("name"=>"value"))
  * ->execute();
  *
- * $result = DBinsert::factory(SafeMySQL $db)
+ * $result = DBinsert::factory()
  * ->into("dbtable")
  * ->setAll(array("title"=>"Hello","text"=>"Hello world!"))
  * ->execute();
  *
- * $result = DBinsert::factory(SafeMySQL $db)
+ * $result = DBinsert::factory()
  * ->into("dbtable")
  * ->set("title","Hello")
  * ->set("text","Hello world!")
  * ->execute();
  *
- * $result = DBinsert::factory(SafeMySQL $db)
+ * $result = DBinsert::factory()
  * ->into("dbtable")
  * ->setPOST()
  * ->execute();
@@ -38,9 +38,9 @@ require_once('DBupdate.class.php');
 class DBinsert extends DBupdate
 {
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        parent::__construct($db);
+        parent::__construct();
     }
 
 	/**
@@ -66,9 +66,9 @@ class DBinsert extends DBupdate
         return $query;
     }
 
-    public static function factory(SafeMySQL $db)
+    public static function factory()
     {
-        return new DBinsert($db);
+        return new DBinsert();
     }
 
 }

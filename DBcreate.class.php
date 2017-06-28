@@ -11,7 +11,7 @@
  * 
  * Example:
  *
- * $result = DBcreate::factory($conn)
+ * $result = DBcreate::factory()
  * ->table("test_create")
  * ->id('id')
  * ->varchar('name', '50')
@@ -29,9 +29,9 @@ class DBcreate extends DBquery
     private $charset = 'utf8';
     private $collate = 'utf8_general_ci';
 
-    function __construct(SafeMySQL $db)
+    function __construct()
     {
-        parent::__construct($db);
+        parent::__construct();
     }
 
     /**
@@ -206,14 +206,13 @@ class DBcreate extends DBquery
             $q[] = $s;
         }
         $query.= " (\n".implode(",\n", $q)." \n) CHARACTER SET ".$this->charset." COLLATE ".$this->collate."; ";
-        $query.= $this->getWhereQuery();
-        //echo $query;
+        $query.= $this->getWhereQuery();        
         return $query;
     }
 
-    public static function factory(SafeMySQL $db)
+    public static function factory()
     {
-        return new DBcreate($db);
+        return new DBcreate();
     }
 
 }

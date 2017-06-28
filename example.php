@@ -4,18 +4,8 @@ require_once('Config.class.php');
 require_once('safemysql.php');
 require_once('DB.class.php');
 
-$opts = array(
-	'user'    => Config::DB_USER,
-	'pass'    => Config::DB_PASS,
-	'db'      => Config::DB_NAME,
-	'charset' => Config::DB_CHARSET
-);
-
-// SafeMySQL
-$conn = new SafeMySQL($opts);
-
 // CREATE TABLE
-$result = DB::create($conn)
+$result = DB::create()
 ->table("data_table")
 ->id('id')
 ->varchar('title', '255')
@@ -24,7 +14,7 @@ echo "<h3>Create:</h3>";
 var_dump($result);
 
 // INSERT INTO TABLE
-$result = DB::insert($conn)
+$result = DB::insert()
 ->into("data_table")
 ->set('title','data1')
 ->execute();
@@ -32,7 +22,7 @@ echo "<h3>Insert:</h3>";
 var_dump($result);
 
 // SELECT FROM TABLE
-$result = DB::select($conn)
+$result = DB::select()
 ->names('id','title')
 ->from("data_table")
 ->where('id','1')
@@ -41,7 +31,7 @@ echo "<h3>Select:</h3>";
 var_dump($result);
 
 // UPDATE TABLE
-$result = DB::update($conn)
+$result = DB::update()
 ->table("data_table")
 ->set('id','1')
 ->set('title','data2')
@@ -50,7 +40,7 @@ echo "<h3>Update:</h3>";
 var_dump($result);
 
 // DELETE FROM TABLE
-$result = DB::delete($conn)
+$result = DB::delete()
 ->from("data_table")
 ->where('id','3')
 ->execute();
