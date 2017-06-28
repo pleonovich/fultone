@@ -44,6 +44,7 @@ require_once('DBselect.class.php');
 require_once('DBinsert.class.php');
 require_once('DBupdate.class.php');
 require_once('DBcreate.class.php');
+require_once('DBdelete.class.php');
 
 class DB
 {
@@ -56,7 +57,7 @@ class DB
      */
     public static function __callStatic($name, array $params)
     {
-        $funcs = array('select', 'insert' , 'update', 'create');
+        $funcs = array('select', 'insert' , 'update', 'create', 'delete');
         foreach ($funcs as $f) {
             if ($name===$f) {
                 $classname = 'DB'.$f;

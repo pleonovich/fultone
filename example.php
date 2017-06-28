@@ -36,7 +36,6 @@ $result = DB::select($conn)
 ->names('id','title')
 ->from("data_table")
 ->where('id','1')
-->limit(3)
 ->executeAll();
 echo "<h3>Select:</h3>";
 var_dump($result);
@@ -48,4 +47,12 @@ $result = DB::update($conn)
 ->set('title','data2')
 ->executeODKU();
 echo "<h3>Update:</h3>";
+var_dump($result);
+
+// DELETE FROM TABLE
+$result = DB::delete($conn)
+->from("data_table")
+->where('id','3')
+->execute();
+echo "<h3>Delete:</h3>";
 var_dump($result);
