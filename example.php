@@ -23,9 +23,10 @@ var_dump($result);
 
 // SELECT FROM TABLE
 $result = DB::select()
-->names('id','title')
+->all()
 ->from("data_table")
-->where('id','1')
+->innerJoin("data_text","id")
+//->where('id','1')
 ->executeAll();
 echo "<h3>Select:</h3>";
 var_dump($result);

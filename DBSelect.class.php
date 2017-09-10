@@ -43,12 +43,16 @@ class DBselect extends DBquery
      */
     public function names()
     {
-		$names = func_get_args();		
+		$names = func_get_args();
         if (count($names)>0) {
-            $this->names = $names;
+            if(is_array($names[0])) { 
+                $this->names = $names[0];
+            } else {
+                $this->names = $names;
+            }
         } else {
 			$this->names = array("*");
-		}     
+		}
         return $this;
     }
 
@@ -59,7 +63,7 @@ class DBselect extends DBquery
      */
     public function distinct()
     {
-		$this->distinct = true;		    
+		$this->distinct = true;
         return $this;
     }
 
@@ -69,9 +73,9 @@ class DBselect extends DBquery
      * @param string $names - db cells names
      * @return this object
      */
-    public function selectAll()
+    public function all()
     {
-        $this->names = array("*");        
+        $this->names = array("*");
         return $this;
     }
 
@@ -94,6 +98,7 @@ class DBselect extends DBquery
     {
         $query = " SELECT ".($this->distinct ? 'DISTINCT ' : '').implode(",", $this->names);
         $query.= $this->db->parse(" FROM ?n ", $this->table);
+        $query.= $this->getJoinQuery();
         $query.= $this->getWhereQuery();
         $query.= $this->getGroupByQuery();
         $query.= $this->getOrderByQuery();

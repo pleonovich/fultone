@@ -55,7 +55,7 @@ class DB
      */
     public static function __callStatic($name, array $params)
     {
-        $funcs = array('select', 'insert' , 'update', 'create', 'delete');
+        $funcs = array('select', 'insert' , 'update', 'create', 'delete', 'query');
         foreach ($funcs as $f) {
             if ($name===$f) {
                 $classname = 'DB'.$f;
@@ -66,5 +66,9 @@ class DB
                 }
             }
         }
+    }
+
+    public static function conn () {
+        return DBSelect::factory()->connect();
     }
 }

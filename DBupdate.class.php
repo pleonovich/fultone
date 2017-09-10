@@ -102,7 +102,7 @@ class DBupdate extends DBquery
     public function setPOST()
     {
         $this->initNames();
-        $diff = array_diff($_POST, $this->values);        
+        $diff = array_intersect_key($_POST, $this->values);
         $this->setAll($diff);
         return $this;
     }
