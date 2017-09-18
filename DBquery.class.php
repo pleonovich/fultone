@@ -28,9 +28,10 @@ abstract class DBquery
     protected $orderByDesc = false;
     protected $limit = array();
 
-    function __construct()
-    {
-         $this->connect();
+    function __construct( $table=null )
+    {   
+        $this->table = $table;
+        $this->connect();
     }
 
     /**

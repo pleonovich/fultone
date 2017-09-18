@@ -9,27 +9,26 @@
 
 class Model extends DB {
 	
-	protected $table;
 	protected $description;
 	protected $names = array();
 	protected $conn;
 	
-	function __construct($table) {
-		$this->table = $table;
-		$this->conn = self::conn();
-	}
+	// function __construct($table) {
+	// 	static::$table = $table;
+	// 	$this->conn = self::conn();
+	// }
 
 	/**
      * Get all from db table
      *
      * @return boolean - result
      */
-	public function all () {
+	public static function all () {
 		$res = false;
 		try {
 			$res = self::select()
 			->names('*')
-			->from($this->table)
+			->from(static::$table)
 			->executeAll();
 		} catch ( Exception $e ) {
 			LOG::writeException($e);
@@ -42,12 +41,12 @@ class Model extends DB {
      *
      * @return boolean - result
      */
-	public function getNames () {
+	public static function getNames () {
 		$res = false;
 		try {
 			$res = self::select()
 			->names(func_get_args())
-			->from($this->table)
+			->from(static::$table)
 			->executeAll();
 		} catch ( Exception $e ) {
 			LOG::writeException($e);
@@ -60,12 +59,12 @@ class Model extends DB {
      *
      * @return boolean - result
      */
-	public function __get ($name) {
+	public static function column ($name) {
 		$res = false;
 		try {
 			$res = self::select()
 			->names($name)
-			->from($this->table)
+			->from(static::$table)
 			->executeCol();
 		} catch ( Exception $e ) {
 			LOG::writeException($e);
@@ -79,12 +78,12 @@ class Model extends DB {
      * @param int $id - row id
      * @return array - result
      */
-	public function getById ( $id ) {
+	public static function getById ( $id ) {
 		$res = false;
 		try {
 			$res = self::select()
 			->names('*')
-			->from($this->table)
+			->from(static::$table)
 			->where("id","=",$id)
 			->executeRow();
 		} catch ( Exception $e ) {
@@ -100,12 +99,12 @@ class Model extends DB {
      * @param string $value - value
      * @return array - result
      */
-	public function getByValue ( $name, $value ) {
+	public static function getByValue ( $name, $value ) {
 		$res = false;
 		try {
 			$res = self::select()
 			->names('*')
-			->from($this->table)
+			->from(static::$table)
 			->where($name,"=",$value)
 			->executeRow();
 		} catch ( Exception $e ) {
@@ -122,7 +121,7 @@ class Model extends DB {
      * @param string $value - value
      * @return boolean - result
      */
-	 public function namesByValue () {
+	 public static function namesByValue () {
 		$args = func_get_args();
 		$names = array_shift($args);
 		$name = array_shift($args);
@@ -131,7 +130,7 @@ class Model extends DB {
 		try {
 			$res = self::select()
 			->names($names)
-			->from($this->table)
+			->from(static::$table)
 			->where($name,"=",$value)
 			->executeAll();
 		} catch ( Exception $e ) {
@@ -145,11 +144,11 @@ class Model extends DB {
      *
      * @return boolean - result
      */
-	public function save () {
+	public static function save () {
 		$res = false;
 		try {
 			$res = self::update()
-			->table($this->table)
+			->table(static::$table)
 			->setPOST()
 			->executeODKU();
 		} catch ( Exception $e ) {
@@ -163,17 +162,41 @@ class Model extends DB {
      *
      * @return boolean - result
      */
-	public function remove ( $name, $value ) {
+	public static function remove ( $name, $value ) {
 		$res = false;
 		try {
 			$res = self::delete()
-			->from($this->table)
+			->from(static::$table)
 			->where($name, $value)
 			->execute();
 		} catch ( Exception $e ) {
 			LOG::writeException($e);
 		}
 		return $res;
+	}
+
+	protected static function schema ($create){
+		$create = false;
+	}
+
+	public static function migrate () {
+		$create = self::create()->table(static::$table);
+		static::schema($create);
+		if(!$create) return false;
+		if(is_a($create,'DBcreate')) return $create->execute();
+		return false;
+	}
+
+	protected static function setData ($insert) {
+		$insert = false;
+	}
+
+	public static function insertData () {
+		$insert = self::insert()->into(static::$table);
+		static::setData($insert);
+		if(!$insert) return false;
+		if(is_a($insert,'DBinsert')) return $insert->execute();
+		return false;
 	}
 	
 	public static function factory ( $table ) {

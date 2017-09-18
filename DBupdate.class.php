@@ -38,9 +38,9 @@ require_once('DBquery.class.php');
 class DBupdate extends DBquery
 {
 
-    function __construct()
+    function __construct($table)
     {
-        parent::__construct();
+        parent::__construct($table);
     }
 
 	/**

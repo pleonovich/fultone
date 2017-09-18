@@ -48,6 +48,8 @@ require_once('DBdelete.class.php');
 
 class DB
 {
+    protected static $table;
+
     /**
      * Select, insert , update or create
      *
@@ -60,7 +62,7 @@ class DB
             if ($name===$f) {
                 $classname = 'DB'.$f;
                 if (class_exists($classname)) {
-                    return new $classname();
+                    return new $classname(static::$table);
                 } else {
                     die("Error! $classname class doesn`t found");
                 }
