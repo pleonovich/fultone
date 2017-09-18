@@ -45,6 +45,23 @@ $result = DB::select()
 ->executeAll();
 ```
 
+### Select from table using JOIN
+```php
+// Description:
+DBselect innerJoin ( String $name, int $id ) 
+DBselect leftJoin ( String $name, int $id ) 
+DBselect rightJoin ( String $name, int $id ) 
+DBselect crossJoin ( String $name, int $id ) 
+
+// Example:
+$result = DB::select()
+->all()
+->from("data_table")
+->innerJoin("data_text","id")
+->executeAll();
+```
+
+
 ### Update table
 ```php
 $result = DB::update()
