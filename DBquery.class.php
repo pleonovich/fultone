@@ -1,81 +1,43 @@
 <?php
 /**
- * DBQUERY CLASS 1.0.1
- *
  * @author leonovich.pavel@gmail.com
- * DBquery is simple ORM object-relational queries mapper, using SafeMySQL.
+ * DBquery is simple queries mapper, using SafeMySQL.
  *
  * Requirements:
  * https://github.com/colshrapnel/safemysql
  *
  */
 
-abstract class DBquery
-{
 
-    protected $db;
-    protected $table;
+class DBquery
+{
+    /**
+    * @var SafeMySQL
+    */
+    public $db;
+
+    /**
+    * @var DBtable
+    */
+    public $table;
+
     protected $post;
-    protected $description;
-    protected $names;
-    protected $values;
+    protected $distinct = false;
     protected $join = array();
     protected $where = array();
     protected $operators = array('=','!=','<>','>','<','>=','<=','LIKE','IS','IN','NOT IN');
-    protected $types = array('AND','OR');
+    protected $types = array('AND','OR', 'NOT');
     protected $groupBy;
     protected $orderBy;
     protected $orderByDesc = false;
     protected $limit = array();
+    protected $emode = 'error';
 
-    function __construct( $table=null )
-    {   
-        $this->table = $table;
-        $this->connect();
-    }
-
-    /**
-     * DB connection
-     */
-    public function connect()
-    {
-        if ($this->db===null) {
-            $this->db = new SafeMySQL(array(
-            'user'    => Config::DB_USER,
-            'pass'    => Config::DB_PASS,
-            'db'      => Config::DB_NAME,
-            'charset' => Config::DB_CHARSET
-            ));
-        } else {
-            return $this->db;
-        }
-    }
-
-    protected function describe()
-    {
-        return $this->db->getAll(" DESCRIBE ?n ", $this->table);
-    }
-
-    protected function initNames()
-    {
-        $this->description = $this->describe();
-        foreach ($this->description as $one) {
-            $this->names[] = $one["Field"];
-            $this->values[$one["Field"]] = null;
-        }        
-    }
-
-    protected function checkPost()
-    {
-        $this->initNames();
-        return array_intersect_key($_POST, $this->values);
+    function __construct() {
+        $this->db = DBConnect::get();
     }
     
-    /**
-     * JOIN
-     */
-
-    protected function addJoin ( $type, $table, $using ) {
+    private function addJoin ( $type, $table, $using ) {
         $next = count($this->where);
         $this->join[$next]['type'] = $type;
         $this->join[$next]['table'] = $table;
@@ -102,7 +64,7 @@ abstract class DBquery
         return $this;
     }
 
-    protected function getJoinQuery()
+    private function getJoinQuery()
     {
         if (count($this->join)==0) {
             return null;
@@ -115,67 +77,91 @@ abstract class DBquery
     }
 
     /**
-     * WHERE
+     * Set distinct is true
+     *
+     * @return this object
      */
+    public function distinct()
+    {
+		$this->distinct = true;
+        return $this;
+    }
 
-     protected function addWhere($name, $operator, $value, $type = null)
-     {
-         $next = count($this->where);
-         $this->where[$next]['name'] = $name;
-         $this->where[$next]['operator'] = $operator;
-         $this->where[$next]['value'] = $value;
-         if ($type!==null) {
-             $this->where[$next]['type'] = $type;
+    private function addWhere(string $name, string $operator, $value, string $type = null)
+    {
+        if (!$this->table->issetFieldName($name)) {
+            $this->error("Unknown column '$name' in filter options");
+        }
+        $next = count($this->where);
+        $this->where[$next]['name'] = $name;
+        $this->where[$next]['operator'] = $operator;
+        $this->where[$next]['value'] = $value;
+        if ($type!==null) {
+            $this->where[$next]['type'] = $type;
         }
     }
 
-    public function where($name, $operator, $value = null)
+    /**
+     * SET WHERE
+     * 
+     * @param Array $filter - filter options
+     * @param string $type - operator, default - AND
+     * @return this
+     */
+    public function where(Array $filter, string $type = "AND")
     {
-        if (!in_array($operator, $this->operators)) {
-            $value = $operator;
-            $operator = '=';
+        if (isset($filter) > 0) { 
+            foreach ($filter as $name=>$value) {
+                if(in_array(strtoupper($name), $this->types)) {
+                    $this->where($value, $name);
+                    break; 
+                }
+                if (is_array($value)) {
+                    if (count($value) > 1) {
+                        throw new Exception("Invalid value in filter options");
+                    }
+                    foreach($value as $operator=>$value) {
+                        if (!in_array($operator, $this->operators)) {
+                            throw new Exception("Unknown operator in filter options");
+                        }
+                        $this->addWhere($name, $operator, $value, $type);
+                    }
+                    continue;
+                }
+                $this->addWhere($name, "=", $value, $type);
+            }
         }
-        $this->addWhere($name, $operator, $value);
-        return $this;
-    }
-    
-    public function andWhere($name, $operator, $value)
-    {
-        $this->addWhere($name, $operator, $value, 'AND');
-        return $this;
-    }
-    
-    public function orWhere($name, $operator, $value)
-    {
-        $this->addWhere($name, $operator, $value, 'OR');
         return $this;
     }
 
-    protected function getWhereQuery()
+    private function getWhereQuery()
     {
         if (count($this->where)==0) {
             return null;
         }
         $query = " WHERE ";
-        foreach ($this->where as $one) {
+        foreach ($this->where as $key=>$one) {
             if (isset($one['type']) && in_array($one['type'], $this->types)) {
-                $query.= $one['type'];
+                $query.= ($key !== 0) ? $one['type'] : null;
             }
             if (in_array($one['operator'], $this->operators)) {
-                $query.= $this->db->parse(" ?n ".$one['operator']." ?s ", $one['name'], $one['value']);
+                if ($one['operator'] === 'IN' && is_array($one['value'])) {
+                    $query.= $this->db->parse(" ?n ".$one['operator']." (?a) ", $one['name'], $one['value']);
+                } else {
+                    $query.= $this->db->parse(" ?n ".$one['operator']." ?s ", $one['name'], $one['value']);
+                }
             }
         }
+        $this->where = [];
         return $query;
     }
 
     /**
-     * HAVING
-     */
-
-    /**
      * ORDER BY
+     * @param string|Array $names - fields names
+     * @param boolean $desc - sort order
+     * @return this
      */
-
     public function orderBy($names, $desc = false)
     {
         if (is_array($names)) {
@@ -187,6 +173,11 @@ abstract class DBquery
         return $this;
     }
 
+    /**
+     * GROUP BY
+     * @param string|Array $names - fields names
+     * @return this
+     */
     public function groupBy($names)
     {
         if (is_array($names)) {
@@ -197,15 +188,15 @@ abstract class DBquery
         return $this;
     }
 
-    protected function getGroupByQuery()
+    private function getGroupByQuery()
     {
         if ($this->groupBy!=null) {
-            return $this->db->parse(" GROUP BY ?p ", implode(", ", $this->groupBy));
+            return $this->db->parse(" GROUP BY ?p ", $this->table->getFieldsNames());
         }
         return null;
     }
     
-    protected function getOrderByQuery()
+    private function getOrderByQuery()
     {
         if ($this->orderBy!=null) {
             if (is_array($this->orderBy)) {
@@ -220,12 +211,8 @@ abstract class DBquery
         }
         return null;
     }
-    
-    /**
-     * LIMIT
-     */
 
-    protected function getLimitQuery()
+    private function getLimitQuery()
     {
         if (count($this->limit)>0) {
             $limit = $this->db->parse(" LIMIT ?i", $this->limit[0]);
@@ -236,27 +223,258 @@ abstract class DBquery
         }
         return null;
     }
-        
-    public function limit($start, $max = null)
+
+    /**
+     * LIMIT
+     * 
+     * @param int $start - limit or start from
+     * @param int $max - max rows
+     * @return this
+     */
+    public function limit(int $start, int $max = null)
     {
         $this->limit = array($start, $max);
         return $this;
     }
 
-    abstract protected function render();
-    
-    /**
-     * Execute query
-     */
-    public function execute()
-    {
-        $query = $this->render();
-        return $this->db->query($query);
+    private function checkFieldNames(Array $data) {
+        foreach($data as $name=>$value) {
+            if (!$this->table->issetFieldName($name)) {
+                $this->error("Unknown column '$name' in filter options");
+            }
+        }
     }
 
-    public function __toString()
+    private function renderCreateQuery()
     {
-        return $this->render();
+        $query = $this->db->parse(" CREATE TABLE IF NOT EXISTS ?n ", $this->table->name);
+        $q = array();
+        foreach ($this->table->fields as $f) {
+            $s = " ".$f->name." ".$f->type;
+            $s.= !in_array($f->type, array('TEXT','DATE','TIME','DATETIME')) ? "(".$f->length.")" : "";            
+            $s.= $f->isNull ? " NULL" : " NOT NULL";
+            $s.= $f->default!==null ? " DEFAULT ".$f->default : "";
+            $s.= $f->key ? " AUTO_INCREMENT PRIMARY KEY " : null;
+            $q[] = $s;
+        }
+        $query.= " (\n".implode(",\n", $q)." \n) CHARACTER SET ".$this->table->charset." COLLATE ".$this->table->collate."; ";
+        return $query;
+    }
+
+    private function renderInsertQuery(Array $data)
+    {
+        $this->checkFieldNames($data);
+        $query = $this->db->parse(" INSERT INTO ?n ", $this->table->name);
+        $query.= $this->db->parse(" ( ?p ) VALUES ( ?a ) ", implode(", ", array_keys($data)), $data);
+        $query.= $this->getWhereQuery();
+        return $query;
+    }
+
+    private function renderUpdateQuery(Array $data)
+    {
+        $this->checkFieldNames($data);
+        $query = $this->db->parse(" UPDATE ?n SET ", $this->table->name);
+        $q = array();
+        foreach ($data as $name => $value) {
+            $q[]= $this->db->parse(" ?n=?s ", $name, $value);
+        }
+        $query.= implode(",", $q);
+        $query.= $this->getWhereQuery();
+        return $query;
+    }
+
+    private function renderOnDuplicateUpdateQuery(Array $data)
+    {
+        $this->checkFieldNames($data);
+        $names = array_keys($data);
+        $query = $this->db->parse(" INSERT INTO ?n ", $this->table->name);
+        $query.= $this->db->parse(" ( ?p ) VALUES ( ?a ) ", implode(",", $names), $data);
+        $query.= " ON DUPLICATE KEY UPDATE ";
+        $q = array();
+        foreach ($this->names as $k => $n) {
+            if (!isset($this->values[$k])) {
+                die(" Error. values array doesn`t match names array .");
+            }
+            $q[]= $this->db->parse(" ?n=?s ", $n, $this->values[$k]);
+        }
+        $query.= implode(",", $q);
+        $query.= $this->getWhereQuery();
+        return $query;
+    }
+
+    private function renderSelectQuery()
+    {
+        $query = " SELECT ".($this->distinct ? 'DISTINCT ' : '').$this->table->getFieldsNames();
+        $query.= $this->db->parse(" FROM ?n ", $this->table->name);
+        $query.= $this->getJoinQuery();
+        $query.= $this->getWhereQuery();
+        $query.= $this->getGroupByQuery();
+        $query.= $this->getOrderByQuery();
+        $query.= $this->getLimitQuery(); //LOG::write($query,"query");
+        echo $query;
+        return $query;
+    }
+
+    private function renderDeleteQuery()
+    {
+        $query = $this->db->parse(" DELETE FROM ?n ", $this->table->name);
+        $query.= $this->getWhereQuery();
+        return $query;
     }
     
+    /**
+     * Create table in db from model
+     *
+     * @return boolean - result
+     */
+    public function createTable() {
+        try {
+            $query = $this->renderCreateQuery();
+            return $this->db->query($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+    
+    /**
+     * Find all rows
+     *
+     * @param Array $where - where options
+     * @return boolean - result
+     */
+    public function findAll(Array $where = []) {
+        try {
+            $this->table->init();
+            $this->where($where);
+            $query = $this->renderSelectQuery();
+            return $this->db->getAll($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Find one row
+     *
+     * @param Array $where - where options
+     * @return boolean - result
+     */
+    public function findOne(Array $where = []) {
+        try {
+            $this->table->init();
+            $this->where($where);
+            $query = $this->renderSelectQuery();
+            return $this->db->getRow($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Insert row data
+     *
+     * @param Array $data - row data
+     * @return boolean - result
+     */
+    public function create(Array $data) {
+        try {
+            $query = $this->renderInsertQuery($data);
+            return $this->db->query($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Update row data
+     *
+     * @param Array $data - row data
+     * @return boolean - result
+     */
+    public function update(Array $data) {
+        try {
+            $query = $this->renderUpdateQuery($data);
+            return $this->db->query($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+
+	/**
+     * Create or update row data
+     *
+     * @param Array $data - row data
+     * @return boolean - result
+     */
+	public function createOrUpdate(Array $data) {
+		try {
+            $query = $this->renderOnDuplicateUpdateQuery($data);
+			return $this->db->query($query);
+		} catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+		}
+	}
+
+    /**
+     * Delete data
+     *
+     * @param Array $where - where options
+     * @return boolean - result
+     */
+    public function delete(Array $where) {
+        try {
+            $this->where($where);
+            $query = $this->renderDeleteQuery();
+            return $this->db->query($query);
+        } catch ( Exception $e ) {
+            LOG::writeException($e);
+            throw $e;
+        }
+    }
+
+    /**
+     * Init table by name
+     *
+     * @param string $tableName - table name
+     * @return boolean - result
+     */
+    public function table(string $tableName) {
+        $this->table = new DBtable($tableName);
+        $this->table->init();
+    }
+
+    protected function error($err)
+	{
+		$err  = __CLASS__.": ".$err;
+		if ( $this->emode == 'error' )
+		{
+			$err .= ". Error initiated in ".$this->caller().", thrown";
+			trigger_error($err,E_USER_ERROR);
+		} else {
+			throw new exception($err);
+		}
+	}
+
+	protected function caller()
+	{
+		$trace  = debug_backtrace();
+		$caller = '';
+		foreach ($trace as $t)
+		{
+			if ( isset($t['class']) && $t['class'] == __CLASS__ )
+			{
+				$caller = $t['file']." on line ".$t['line'];
+			} else {
+				break;
+			}
+		}
+		return $caller;
+	}
+
 }

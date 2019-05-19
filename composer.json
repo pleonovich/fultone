@@ -1,0 +1,37 @@
+{
+    "name": "pleonovich/simdb",
+    "description": "simDB is simple object-relational queries helper for SafeMySQL",
+    "type": "library",
+    "version": "1.0.0",
+    "keywords": [
+        "db",
+        "orm",
+        "MySQL"
+    ],
+    "homepage": "https://github.com/pleonovich/simdb",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Pavel Leonovich",
+            "email": "leonovich.pavel@gmail.com",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/pleonovich/simdb/issues"
+    },
+    "require": {
+        "php": ">=5.0.0",
+        "colshrapnel/safemysql": "1.*",
+        "pleonovich/log": "1.*"
+    },
+    "autoload": {
+        "files": [
+            "DBconnect.class.php",
+            "DBfield.class.php",
+            "DBtable.class.php",
+            "DBquery.class.php",
+            "Fultone.class.php"
+        ]
+    }
+}
