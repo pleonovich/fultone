@@ -5,26 +5,21 @@ simple object-relational queries helper for SafeMySQL
 <https://github.com/colshrapnel/safemysql>
 
 ### DB connection configuration
-Connection configuration in Config.class.php
 ```php
-class Config
-{
-    
-    // DB CONNECTION
-    const DB_USER = 'root';
-    const DB_PASS = '';
-    const DB_NAME = 'simdb';
-    const DB_CHARSET = 'utf8';
-
-}
+Fultone\Config::$db_user = 'root';
+Fultone\Config::$db_pass = '1234';
+Fultone\Config::$db_name = 'simdb';
+Fultone\Config::$db_charset = 'utf8';
 ```
-
 # Using Models
 
 ### Create model for users table
 ```php
+use Fultone\DBmodel as DBmodel;
+use Fultone\DBtable as DBtable;
+use Fultone\DBfield as DBfield;
 
-class Users extends Fultone {
+class Users extends DBmodel {
 
     public $name = 'user_list';
 

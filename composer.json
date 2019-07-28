@@ -1,6 +1,6 @@
 {
-    "name": "pleonovich/simdb",
-    "description": "simDB is simple object-relational queries helper for SafeMySQL",
+    "name": "pleonovich/fultone",
+    "description": "Fultone is simple object-relational queries helper for SafeMySQL",
     "type": "library",
     "version": "1.0.0",
     "keywords": [
@@ -8,7 +8,7 @@
         "orm",
         "MySQL"
     ],
-    "homepage": "https://github.com/pleonovich/simdb",
+    "homepage": "https://github.com/pleonovich/fultone",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -18,7 +18,7 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/pleonovich/simdb/issues"
+        "issues": "https://github.com/pleonovich/fultone/issues"
     },
     "require": {
         "php": ">=5.0.0",
@@ -26,12 +26,8 @@
         "pleonovich/log": "1.*"
     },
     "autoload": {
-        "files": [
-            "DBconnect.class.php",
-            "DBfield.class.php",
-            "DBtable.class.php",
-            "DBquery.class.php",
-            "Fultone.class.php"
-        ]
+        "psr-4": {
+            "Fultone\\": "src/"
+        }
     }
 }

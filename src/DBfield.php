@@ -1,4 +1,7 @@
 <?php
+
+namespace Fultone;
+
 /**
  * @author leonovich.pavel@gmail.com
  *

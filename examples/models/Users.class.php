@@ -1,9 +1,12 @@
-<?php 
-/**
- * USERS CLASS
- */
+<?php
+use Fultone\DBmodel as DBmodel;
+use Fultone\DBtable as DBtable;
+use Fultone\DBfield as DBfield;
 
-class Users extends Fultone {
+/**
+ * USERS CLASS EXAMPLE
+ */
+class Users extends DBmodel {
 
     public $name = 'data_userlist';
 

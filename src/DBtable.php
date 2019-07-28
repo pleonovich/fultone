@@ -1,4 +1,8 @@
 <?php
+namespace Fultone;
+
+use Fultone\DBfield as DBfield;
+
 /**
  * @author leonovich.pavel@gmail.com
  *

@@ -1,6 +1,12 @@
 <?php
+use Fultone\DBmodel as DBmodel;
+use Fultone\DBtable as DBtable;
+use Fultone\DBfield as DBfield;
 
-class Comrads extends Fultone {
+/**
+ * COMRADS CLASS EXAMPLE
+ */
+class Comrads extends DBmodel {
 
     public $name = 'comrads';
 

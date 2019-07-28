@@ -1,4 +1,9 @@
 <?php
+
+namespace Fultone;
+
+use Fultone\DBtable;
+
 /**
  * @author leonovich.pavel@gmail.com
  * DBquery is simple queries mapper, using SafeMySQL.

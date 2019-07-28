@@ -1,4 +1,10 @@
 <?php 
+
+namespace Fultone;
+
+use Fultone\DBquery as DBquery;
+use Fultone\DBtable as DBtable;
+
 /**
  * Fultone 2.0.1
  *
@@ -7,7 +13,7 @@
  *
  */
 
-abstract class Fultone extends DBquery {
+abstract class DBmodel extends DBquery {
 
     public $name;
 
