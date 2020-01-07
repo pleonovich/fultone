@@ -26,9 +26,25 @@ class DBfield {
     const TYPE_MEDIUMINT = 'MEDIUMINT';
     const TYPE_SMALLINT = 'SMALLINT';
     const TYPE_BIGINT = 'BIGINT';
+    const TYPE_BIT = 'BIT';
+
+    const TYPE_FLOAT = 'FLOAT';
+    const TYPE_DOUBLE = 'DOUBLE';
+    const TYPE_DECIMAL = 'DECIMAL';
+
     const TYPE_CHAR = 'CHAR';
     const TYPE_VARCHAR = 'VARCHAR';
+    const TYPE_TINYTEXT = 'TINYTEXT';
     const TYPE_TEXT = 'TEXT';
+    const TYPE_MEDIUMTEXT = 'MEDIUMTEXT';
+    const TYPE_LONGTEXT = 'LONGTEXT';
+    const TYPE_JSON = 'JSON';
+
+    const TYPE_DATE = 'DATE';
+    const TYPE_TIME = 'TIME';
+    const TYPE_YEAR = 'YEAR';
+    const TYPE_DATETIME = 'DATETIME';
+    const TYPE_TIMESTAMP = 'TIMESTAMP';
 
     function __construct (string $name, string $type, $length, $isNull = true, $key = false, $default = null) {
         $this->name = $name;

@@ -2,7 +2,7 @@
     "name": "pleonovich/fultone",
     "description": "Fultone is simple object-relational queries helper for SafeMySQL",
     "type": "library",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": [
         "db",
         "orm",

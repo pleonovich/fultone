@@ -28,9 +28,12 @@ abstract class DBmodel extends DBquery {
 	public function migrate () {
 		$table = new DBtable($this->name);
 		static::schema($table);
-		if(!$table) return false;
-		if(is_a($table,'Table')) return $this->createTable();
-		return false;
+		if(!$table) throw new \Exception("Table schema error");
+		var_dump($table);
+		if(is_a($table,'Fultone\DBtable')) {
+			return $this->createTable();
+		}
+		throw new \Exception("Table schema wrong type error");
 	}
 
 	protected function setData () {
